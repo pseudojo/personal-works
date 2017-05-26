@@ -37,6 +37,7 @@ for UUID in ${UUIDS[@]}; do
     NUM=$((NUM+1))
     MOUNT="/ssd_`printf '%02d' ${NUM}`"
     echo "UUID=${UUID} $MOUNT        ext4    defaults        0 0" >> /etc/fstab
+	mkdir $MOUNT
 done
 echo "# Done." >> /etc/fstab
 
