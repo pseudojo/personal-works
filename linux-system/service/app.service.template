@@ -1,0 +1,40 @@
+# Service file location
+# CentOS : /usr/lib/systemd/system/app.service
+# Ubuntu : /lib/systemd/system/app.service
+
+[Unit]
+Description=App Service Template file
+Documentation=
+BindsTo=
+After=network-online.target firewalld.service
+Wants=network-online.target
+Requires=app.socket
+
+[Service]
+Type=forking
+User=0
+Group=0
+
+ExecStart=/usr/local/custom-app/bin/start.sh
+ExecStop=/usr/local/custom-app/bin/start.sh
+ExecReload=/bin/kill -s HUP $MAINPID
+
+Restart=always
+TimeoutStartSec=3
+TimeoutSec=0
+RestartSec=5
+
+#StartLimitBurst=3
+#StartLimitInterval=60s
+
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+
+TasksMax=infinity
+Delegate=yes
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+
