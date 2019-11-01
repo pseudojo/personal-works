@@ -1,0 +1,7 @@
+DEVICE=eno2
+TYPE=Ethernet
+ONBOOT=yes
+MASTER=bond0
+SLAVE=yes
+BOOTPROTO=none
+USERCTL=no
