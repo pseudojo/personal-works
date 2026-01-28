@@ -1,0 +1,28 @@
+# echo-app-httproute-443-https.yaml
+---
+# echo-route 수정
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-route
+  namespace: echo-app
+spec:
+  parentRefs:
+  - name: traefik-gateway
+    namespace: default 
+spec:
+  parentRefs:
+  - name: traefik-gateway
+    namespace: default # <--- 입구가 default 네임스페이스에 있음을 명시
+    sectionName: websecure # Gateway의 443포트 리스너 이름
+  hostnames:
+  - "echo.hgcho.test"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: echo-service
+      port: 8000
+---

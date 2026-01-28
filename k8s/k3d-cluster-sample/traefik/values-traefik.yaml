@@ -1,0 +1,68 @@
+# values-traefik.yaml
+---
+# 1. Gateway API 프로바이더 활성화
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
+  kubernetesGateway:
+    enabled: true # Gateway API 지원 활성화
+
+# 2. GatewayClass 자동 생성
+gatewayClass:
+  enabled: true
+  name: "traefik" # 기본 설정인 현재 설정된 gatewayClassName과 일치
+
+# 3. Gateway 리소스 상세 설정
+gateway:
+  enabled: true
+  name: "traefik-gateway" # 기본 설정인 현재 이름 유지
+  listeners:
+    web:
+      port: 8000
+      protocol: HTTP
+      namespacePolicy: 
+        from: "All" # allowedRoutes.namespaces.from: All 과 동일
+    websecure:
+      port: 8443
+      protocol: HTTPS
+      namespacePolicy: 
+        from: "All" # allowedRoutes.namespaces.from: All 과 동일
+      mode: Terminate
+      certificateRefs:
+        - name: hgcho-test-tls-secret # 요청하신 TLS 시크릿 이름
+
+# 4. Traefik 컨테이너 포트 및 서비스 포트 매핑
+ports:
+  web:
+    port: 8000        # 컨테이너 내부 포트
+    exposedPort: 80   # 외부 서비스(LoadBalancer) 포트
+    # [중요] HTTP to HTTPS 글로벌 리다이렉트 설정
+    # Gateway API 표준 필터(RequestRedirect)를 써도 되지만, 
+    # 차트 레벨에서 설정하는 것이 가장 에러(503)가 없고 깔끔합니다.
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    port: 8443        # 컨테이너 내부 포트
+    exposedPort: 443  # 외부 서비스(LoadBalancer) 포트
+    http:
+      tls:
+        enabled: true # Entrypoint 레벨에서도 TLS 활성화
+
+## 5. 기타 권장 설정
+#deployment:
+#  kind: Deployment
+#  replicas: 1
+
+logs:
+  general:
+    level: INFO # 이슈 발생 시 DEBUG로 변경하여 확인 가능
+
+---
+

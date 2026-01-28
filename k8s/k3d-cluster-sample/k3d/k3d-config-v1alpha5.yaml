@@ -1,0 +1,76 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+image: rancher/k3s:v1.35.0-k3s1
+metadata:
+  name: my-gateway-cluster
+servers: 1
+agents: 4
+kubeAPI:
+  hostPort: "6443"
+ports:
+- nodeFilters:
+  - loadbalancer
+  port: 80:80
+- nodeFilters:
+  - loadbalancer
+  port: 443:443
+subnet: 172.18.0.0/16
+options:
+  k3d:
+    disableImageVolume: false
+    disableLoadbalancer: false
+    disableRollback: false
+    loadbalancer:
+      configOverrides:
+      - settings.workerConnections=2048
+    timeout: 120s
+    wait: true
+  k3s:
+    extraArgs:
+    - arg: --disable=traefik
+      nodeFilters:
+      - server:*
+    - arg: --tls-san=hgcho.test
+      nodeFilters:
+      - server:*
+    - arg: --cluster-init
+      nodeFilters:
+      - server:0
+    - arg: --cluster-cidr=10.12.0.0/17
+      nodeFilters:
+      - server:*
+    - arg: --service-cidr=10.12.128.0/17
+      nodeFilters:
+      - server:*
+    nodeLabels:
+    - label: team=common
+      nodeFilters:
+      - server:0
+      - agent:0
+      - agent:1
+    - label: team=compute
+      nodeFilters:
+      - agent:2
+      - agent:3
+  kubeconfig:
+    switchCurrentContext: true
+    updateDefaultKubeconfig: true
+  runtime:
+    #HostPidMode: false
+    labels:
+    - label: company=hgcho
+      nodeFilters:
+      - server:*
+      - agent:*
+registries:
+  create:
+    name: docker-io # name of the registry container
+    proxy:
+      remoteURL: https://registry-1.docker.io # proxy DockerHub
+    volumes:
+      - /tmp/reg:/var/lib/registry # persist data locally in /tmp/reg
+  config: | # tell K3s to use this registry when pulling from DockerHub
+    mirrors:
+      "docker.io":
+        endpoint:
+          - http://docker-io:5000

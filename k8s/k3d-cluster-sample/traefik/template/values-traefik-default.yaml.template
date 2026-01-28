@@ -1,0 +1,23 @@
+# values-traefik-default.yaml
+---
+# 1. Gateway API 프로바이더 활성화
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesGateway:
+    enabled: true
+  kubernetesIngress:
+    enabled: true # Gateway API 지원 활성화
+
+# 2. GatewayClass 자동 생성
+gatewayClass:
+  enabled: true
+  name: "traefik" # 기본 설정인 현재 설정된 gatewayClassName과 일치
+
+# 3. Gateway 리소스 상세 설정
+gateway:
+  enabled: true
+  name: "traefik-gateway" # 기본 설정인 현재 이름 유지
+
+---
+

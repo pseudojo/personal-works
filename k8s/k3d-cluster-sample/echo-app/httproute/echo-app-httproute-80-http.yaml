@@ -1,0 +1,24 @@
+# echo-app-httproute-80-http.yaml
+---
+# HTTP -> HTTPS 리다이렉트 전용 Route
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo-redirect-route
+  namespace: echo-app
+spec:
+  parentRefs:
+  - name: traefik-gateway
+    namespace: default
+    sectionName: web # Gateway의 80포트 리스너 이름
+  hostnames:
+  - "echo.hgcho.test"
+  #rules:
+  #- filters:
+  #  # Traefik Middleware 대신 Gateway API 표준 필터 사용
+  #  - type: RequestRedirect
+  #    requestRedirect:
+  #      scheme: https
+  #      # Redirect statusCode can be only 301(permanent move) or 302(temporary move).
+  #      statusCode: 301
+---
