@@ -40,27 +40,56 @@ Before running the command, determine the "what" and "why".
 2.  **Execute the Command**: Run the command using `run_shell_command` or another tool.
 3.  **Capture the Output**: Save the entire `stdout` and `stderr` from the tool's result.
 
-### Step 2.3: Call the Logging Script
+### Step 2.3: Log the Action
 
-Use the `log-action.sh` script to write the entry. This is done by passing metadata as arguments and the detailed content as environment variables.
+You must construct the log entry manually and append it to the log file.
 
-**Example Invocation:**
+If you are in an environment without a shell, you must construct the log entry manually and append it to the log file.
 
-```bash
-# 1. Set the multi-line content as environment variables
-export LOG_DETAILS="- To understand the project structure before making changes.
-- To check for the existence of a configuration file."
-export LOG_COMMAND="ls -F"
-export LOG_OUTPUT="README.md
-src/
-dist/
-package.json"
+1.  **Read the existing log file** to see its current content.
+2.  **Construct the new log entry** by following the template below.
+3.  **Append the new entry** to the `LOG_FILE`.
 
-# 2. Run the script with single-line metadata as arguments
-# ./log-action.sh "LOG_FILE" "TASKLOG_ID" "TASK_DESCRIPTION" "ACTION_SUMMARY"
-./scripts/log-action.sh "$LOG_FILE" "$TASKLOG_ID" "$TASK_DESCRIPTION" "List project root directory contents"
+**Log Entry Template:**
+
+````markdown
+---
+**Task:** {TASK_DESCRIPTION}
+**Timestamp:** {YYYY-MM-DDTHH:MM:SSZ}
+**Date:** {YYYY-MM-DD}
+**Action:**
+{ACTION_SUMMARY}
+
+**Details:**
+{LOG_DETAILS}
+
+**Command:**
+```shell
+{LOG_COMMAND}
 ```
 
-## 3. Reference Example
+**Output:**
+```text
+{LOG_OUTPUT}
+```
 
-For a complete example of a well-formatted log file, **always refer to `references/example-log.md`**. This ensures consistency in the output.
+````
+
+**How to fill the template:**
+
+*   `{TASK_DESCRIPTION}`: The variable you defined in the initialization step.
+*   `{TIMESTAMP}` & `{DATE}`: Generate these using the current UTC time.
+*   `{ACTION_SUMMARY}`: The single-sentence summary of the action.
+*   `{LOG_DETAILS}`: The detailed, multi-line explanation.
+*   `{LOG_COMMAND}`: The exact command you executed.
+*   `{LOG_OUTPUT}`: The complete output from the command.
+
+Ensure you append this to the `$LOG_FILE` correctly. The `---` separator is crucial for separating entries.
+
+## 3. Reference Examples
+
+For complete examples of well-formatted log files for different scenarios, **always refer to the files in the `references/` directory**.
+
+- `references/example-log-python-task.md`
+- `references/example-log-analysis-task.md`
+- `references/example-log-skill-install-task.md`
